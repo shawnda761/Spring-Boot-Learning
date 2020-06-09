@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.adventureisland.demo.dao.PurchaseDao">
+  <insert id="insertPurchaseRecord" parameterType="purchase">
+    insert into primarydb.purchase (user_id, product_id, price, amount, summary, purchase_time, comment)
+    values (#{userId}, #{productId}, #{price}, #{amount}, #{summary}, now(), #{comment})
+  </insert>
+</mapper>
