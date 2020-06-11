@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.adventureisland.demo.dao.ProductDao">
+
+  <select id="getMaxProductId" resultType="java.lang.Long">
+    select max(id) as productId from primarydb.product where version = 1 
+  </select>
+
+  <select id="getAllProducts" resultType="product">
+    select 
+          id as id, catalogue_id as catalogueId, name as name, update_time as updateTime, 
+          version as version, comment as comment  
+    from  primarydb.product 
+    where version = 1
+  </select>
+
+  <select id="getAllProductsInfo" resultType="product">
+    select 
+          primarydb.product.id as id, primarydb.product.catalogue_id as catalogueId, 
+          primarydb.product.name as name, primarydb.price.price as price, 
+          primarydb.stock.stock_amount as stockAmount, primarydb.product.update_time as updateTime, 
+          primarydb.product.version as version, primarydb.product.comment as comment  
+    from  primarydb.product 
+    left outer join primarydb.price on primarydb.product.id = primarydb.price.product_id and primarydb.price.version = 1 
+    left outer join primarydb.stock on primarydb.product.id = primarydb.stock.product_id and primarydb.stock.version = 1 
+    where primarydb.product.version = 1 
+  </select>
+
+  <select id="getProductById" parameterType="java.lang.Long" resultType="product">
+    select 
+          id as id, catalogue_id as catalogueId, name as name, update_time as updateTime, 
+          version as version, comment as comment  
+    from  primarydb.product 
+    where version = 1 and id = #{id}
+  </select>
+
+  <select id="getProductInfoById" parameterType="java.lang.Long" resultType="product">
+    select 
+          primarydb.product.id as id, primarydb.product.catalogue_id as catalogueId, 
+          primarydb.product.name as name, primarydb.price.price as price, 
+          primarydb.stock.stock_amount as stockAmount, primarydb.product.update_time as updateTime, 
+          primarydb.product.version as version, primarydb.product.comment as comment  
+    from  primarydb.product 
+    left outer join primarydb.price on primarydb.price.product_id = #{id} and primarydb.price.version = 1 
+    left outer join primarydb.stock on primarydb.stock.product_id = #{id} and primarydb.stock.version = 1 
+    where primarydb.product.id = #{id} and primarydb.product.version = 1 
+  </select>
+
+  <select id="getProductInfoByName" parameterType="java.lang.String" resultType="product">
+    select 
+          primarydb.product.id as id, primarydb.product.catalogue_id as catalogueId, 
+          primarydb.product.name as name, primarydb.price.price as price, 
+          primarydb.stock.stock_amount as stockAmount, primarydb.product.update_time as updateTime, 
+          primarydb.product.version as version, primarydb.product.comment as comment  
+    from  primarydb.product 
+    left outer join primarydb.price on primarydb.price.product_id = primarydb.product.id and primarydb.price.version = 1 
+    left outer join primarydb.stock on primarydb.stock.product_id = primarydb.product.id and primarydb.stock.version = 1 
+    where primarydb.product.name like concat('%', #{name}, '%') and primarydb.product.version = 1 
+  </select>
+  
+  <select id="getProductPriceTrend" parameterType="queryParameter" resultType="product">
+    select update_Time as updateTime, price from primarydb.price where product_id = #{id} 
+    <if test="startTime != null">
+      and update_time >= #{startTime}
+    </if>
+    <if test="endTime != null">
+      and update_time <![CDATA[<=]]> #{endTime}
+    </if>
+    order by update_time
+  </select>
+
+  <insert id="insertProduct" parameterType="product">
+    insert into primarydb.product (catalogue_id, name, update_time, comment)
+    values (#{catalogueId}, #{name}, now(), #{comment})
+  </insert>
+
+  <insert id="insertProductPrice" parameterType="product">
+    insert into primarydb.price (product_id, price, update_time, comment)
+    values (#{productId}, #{price}, now(), #{comment})
+  </insert>
+
+  <insert id="insertProductStock" parameterType="product">
+    insert into primarydb.stock (product_id, stock_amount, update_time, comment)
+    values (#{productId}, #{stockAmount}, now(), #{comment})
+  </insert>
+
+  <update id="updateProduct" parameterType="product">
+    update primarydb.product 
+    set catalogue_id = #{catalogueId}, name = #{name}, update_time = now(), comment = #{comment} 
+    where version = 1 and id = #{id}
+  </update>
+
+  <update id="updateProductPrice" parameterType="product">
+    update primarydb.price 
+    set price = #{price}, update_time = now(), comment = #{comment} 
+    where version = 1 and id = #{productId}
+  </update>
+
+  <update id="updateProductStock" parameterType="product">
+    update primarydb.stock 
+    set stock_amount = #{stockAmount}, update_time = now(), comment = #{comment} 
+    where version = 1 and id = #{productId}
+  </update>
+
+  <update id="deleteProduct" parameterType="java.lang.Long">
+    update primarydb.product 
+    set version = 0 
+    where id = #{id}
+  </update>
+
+  <update id="deleteProductPrice" parameterType="java.lang.Long">
+    update primarydb.price 
+    set version = 0 
+    where id = #{productId}
+  </update>
+
+  <update id="deleteProductStock" parameterType="java.lang.Long">
+    update primarydb.stock 
+    set version = 0 
+    where id = #{productId}
+  </update>
+
+</mapper>

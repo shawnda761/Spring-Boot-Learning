@@ -1,6 +1,5 @@
 package com.adventureisland.demo.controller;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +12,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.adventureisland.demo.model.Product;
+import com.adventureisland.demo.model.QueryParameter;
 import com.adventureisland.demo.service.ProductService;
+import com.adventureisland.demo.util.ResultWrapper;
 
 @RestController
 public class ProductController {
@@ -22,66 +23,116 @@ public class ProductController {
 	ProductService productService;
 
 	@GetMapping("/product/all")
-	public List<Product> getAllProducts() {
-		return productService.getAllProducts();
+	public ResultWrapper<Product> getAllProducts() {
+		List<Product> productList = productService.getAllProducts();
+		return new ResultWrapper<Product>((productList != null && productList.size() > 0), ("Get all products"),
+				productList);
+	}
+
+	@GetMapping("/productInfo/all")
+	public ResultWrapper<Product> getAllProductsInfo() {
+		List<Product> productInfoList = productService.getAllProductsInfo();
+		return new ResultWrapper<Product>((productInfoList != null && productInfoList.size() > 0), ("Get all products"),
+				productInfoList);
 	}
 
 	@GetMapping("/product/{id}")
-	public Product getProductById(@PathVariable("id") Long id) {
-		return productService.getProductById(id);
+	public ResultWrapper<Product> getProductById(@PathVariable("id") Long id) {
+		List<Product> singleProduct = productService.getProductById(id);
+		return new ResultWrapper<Product>((singleProduct != null && singleProduct.size() > 0), ("Get product " + id),
+				singleProduct);
 	}
 
-	@PostMapping("/product/{productInfo}")
-	public List<Product> addProductByPathVariable(@PathVariable("productInfo") String productInfo) {
-		Product newProduct = new Product();
-		newProduct.setId(Long.valueOf(productInfo.split("_")[0]));
-		newProduct.setName(productInfo.split("_")[1]);
-		newProduct.setPrice(new BigDecimal(productInfo.split("_")[2]));
-		newProduct.setStock(Integer.valueOf(productInfo.split("_")[3]));
-		newProduct.setVersion(Integer.valueOf(productInfo.split("_")[4]));
-		newProduct.setComment(productInfo.split("_")[5]);
-		if (productService.addProduct(newProduct)) {
-			return productService.getAllProducts();
-		}
-		return null;
+	@GetMapping("/productsInfo/{name}")
+	public ResultWrapper<Product> getProductInfoByName(@PathVariable("name") String name) {
+		List<Product> productInfoList = productService.getProductInfoByName(name);
+		return new ResultWrapper<Product>((productInfoList != null && productInfoList.size() > 0),
+				"Get product info by name", productInfoList);
+	}
+
+	@GetMapping("/productPriceTrend")
+	public ResultWrapper<Product> getProductPriceTrend(@RequestBody QueryParameter queryParameter) {
+		List<Product> productPriceList = productService.getProductPriceTrend(queryParameter);
+		return new ResultWrapper<Product>((productPriceList != null && productPriceList.size() > 0),
+				"Get product price trend", productPriceList);
+	}
+
+	@GetMapping("/productInfo/{id}")
+	public ResultWrapper<Product> getProductInfoById(@PathVariable("id") Long id) {
+		List<Product> singleProductInfo = productService.getProductInfoById(id);
+		return new ResultWrapper<Product>((singleProductInfo != null && singleProductInfo.size() > 0),
+				("Get product " + id), singleProductInfo);
 	}
 
 	@PostMapping("/product/add")
-	public List<Product> addProductByRequestBody(@RequestBody Product product) {
-		if (productService.addProduct(product)) {
-			return productService.getAllProducts();
-		}
-		return null;
+	public ResultWrapper<Product> addProduct(@RequestBody Product product) {
+		return new ResultWrapper<Product>(productService.addProduct(product), "Add new product",
+				productService.getAllProductsInfo());
 	}
 
-	@PutMapping("/product/{productInfo}")
-	public List<Product> updateProductByPathVariable(@PathVariable("productInfo") String productInfo) {
-		Product newProduct = new Product();
-		newProduct.setId(Long.valueOf(productInfo.split("_")[0]));
-		newProduct.setName(productInfo.split("_")[1]);
-		newProduct.setPrice(new BigDecimal(productInfo.split("_")[2]));
-		newProduct.setStock(Integer.valueOf(productInfo.split("_")[3]));
-		newProduct.setVersion(Integer.valueOf(productInfo.split("_")[4]));
-		newProduct.setComment(productInfo.split("_")[5]);
-		if (productService.updateProduct(newProduct)) {
-			return productService.getAllProducts();
-		}
-		return null;
+	@PostMapping("/productPrice/add")
+	public ResultWrapper<Product> addProductPrice(@RequestBody Product product) {
+		return new ResultWrapper<Product>(productService.addProductPrice(product), "Add new product price",
+				productService.getAllProductsInfo());
+	}
+
+	@PostMapping("/productStock/add")
+	public ResultWrapper<Product> addProductStock(@RequestBody Product product) {
+		return new ResultWrapper<Product>(productService.addProductStock(product), "Add new product stock",
+				productService.getAllProductsInfo());
+	}
+
+	@PostMapping("/productInfo/add")
+	public ResultWrapper<Product> addProductInfo(@RequestBody Product product) {
+		return new ResultWrapper<Product>(productService.addProductInfo(product), "Add new product info",
+				productService.getAllProductsInfo());
 	}
 
 	@PutMapping("/product/update")
-	public List<Product> updateProductByRequestBody(@RequestBody Product product) {
-		if (productService.updateProduct(product)) {
-			return productService.getAllProducts();
-		}
-		return null;
+	public ResultWrapper<Product> updateProduct(@RequestBody Product product) {
+		return new ResultWrapper<Product>(productService.updateProduct(product), ("Update product " + product.getId()),
+				productService.getAllProductsInfo());
+	}
+
+	@PutMapping("/productPrice/update")
+	public ResultWrapper<Product> updateProductPrice(@RequestBody Product product) {
+		return new ResultWrapper<Product>(productService.updateProductPrice(product),
+				("Update product " + product.getProductId() + "'s price"), productService.getAllProductsInfo());
+	}
+
+	@PutMapping("/productStock/update")
+	public ResultWrapper<Product> updateProductStock(@RequestBody Product product) {
+		return new ResultWrapper<Product>(productService.updateProductStock(product),
+				("Update product " + product.getProductId() + "'s stock"), productService.getAllProductsInfo());
+	}
+
+	@PutMapping("/productInfo/update")
+	public ResultWrapper<Product> updateProductInfo(@RequestBody Product product) {
+		return new ResultWrapper<Product>(productService.updateProductInfo(product),
+				("Update product " + product.getId() + "'s info"), productService.getAllProductsInfo());
 	}
 
 	@DeleteMapping("/product/{id}")
-	public List<Product> addProduct(@PathVariable("id") Long id) {
-		if (productService.removeProduct(id)) {
-			return productService.getAllProducts();
-		}
-		return null;
+	public ResultWrapper<Product> removeProduct(@PathVariable("id") Long id) {
+		return new ResultWrapper<Product>(productService.removeProduct(id), ("Update product " + id),
+				productService.getAllProductsInfo());
+	}
+
+	@DeleteMapping("/productPrice/{id}")
+	public ResultWrapper<Product> removeProductPrice(@PathVariable("id") Long id) {
+		return new ResultWrapper<Product>(productService.removeProductPrice(id), ("Update product " + id + "'s price"),
+				productService.getAllProductsInfo());
+	}
+
+	@DeleteMapping("/productStock/{id}")
+	public ResultWrapper<Product> removeProductStock(@PathVariable("id") Long id) {
+		return new ResultWrapper<Product>(productService.removeProductStock(id), ("Update product " + id + "'s stock"),
+				productService.getAllProductsInfo());
+	}
+
+	@DeleteMapping("/productInfo/{id}")
+	public ResultWrapper<Product> removeProductInfo(@PathVariable("id") Long id) {
+		return new ResultWrapper<Product>(productService.removeProductInfo(id), ("Update product " + id + "'s info"),
+				productService.getAllProductsInfo());
 	}
 }

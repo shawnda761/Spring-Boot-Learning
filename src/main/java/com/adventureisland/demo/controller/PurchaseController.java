@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.adventureisland.demo.service.PurchaseService;
+import com.adventureisland.demo.util.ResultWrapper;
 
 @RestController
 public class PurchaseController {
@@ -14,42 +15,9 @@ public class PurchaseController {
 	PurchaseService purchaseService;
 
 	@PostMapping("/purchase/{userId}/{productId}/{amount}")
-	public Result purchase(@PathVariable("userId") Long userId, @PathVariable("productId") Long productId,
+	public ResultWrapper<?> purchase(@PathVariable("userId") Long userId, @PathVariable("productId") Long productId,
 			@PathVariable("amount") Integer amount) {
-		boolean success = purchaseService.purchase(userId, productId, amount);
-		String message = success ? "purchase success" : "purchase failure";
-		Result result = new Result(success, message);
-		return result;
+		return new ResultWrapper<Object>(purchaseService.purchase(userId, productId, amount), "purchase");
 	}
 
-	class Result {
-		private boolean success = false;
-		private String message = null;
-
-		public Result() {
-
-		}
-
-		public Result(boolean success, String message) {
-			this.success = success;
-			this.message = message;
-		}
-
-		public boolean isSuccess() {
-			return success;
-		}
-
-		public void setSuccess(boolean success) {
-			this.success = success;
-		}
-
-		public String getMessage() {
-			return message;
-		}
-
-		public void setMessage(String message) {
-			this.message = message;
-		}
-
-	}
 }

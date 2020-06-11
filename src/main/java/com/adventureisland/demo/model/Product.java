@@ -1,10 +1,23 @@
 package com.adventureisland.demo.model;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 
-public class Product {
+import org.apache.ibatis.type.Alias;
+
+@Alias("product")
+public class Product implements Serializable {
+
+	public static final long serialVersionUID = 1L;
 
 	private Long id;
+
+	private Long catalogueId;
+
+	private String catalogueName;
+	
+	private Long productId;
 
 	private String name;
 
@@ -12,7 +25,9 @@ public class Product {
 	// java.math.BigDecimal type
 	private BigDecimal price;
 
-	private int stock;
+	private int stockAmount;
+
+	private Timestamp updateTime;
 
 	private int version;
 
@@ -22,11 +37,53 @@ public class Product {
 
 	}
 
-	public Product(Long id, String name, BigDecimal price, int stock, int version, String comment) {
+	public Product(Long id, Long productId, BigDecimal price, Timestamp updateTime, int version, String comment) {
+		this.id = id;
+		this.productId = productId;
+		this.price = price;
+		this.updateTime = updateTime;
+		this.version = version;
+		this.comment = comment;
+	}
+
+	public Product(Long id, Long productId, int stockAmount, Timestamp updateTime, int version, String comment) {
+		this.id = id;
+		this.productId = productId;
+		this.stockAmount = stockAmount;
+		this.updateTime = updateTime;
+		this.version = version;
+		this.comment = comment;
+	}
+
+	public Product(Long id, String name, BigDecimal price, int stockAmount, int version, String comment) {
+		super();
 		this.id = id;
 		this.name = name;
 		this.price = price;
-		this.stock = stock;
+		this.stockAmount = stockAmount;
+		this.version = version;
+		this.comment = comment;
+	}
+
+	public Product(Long id, Long catalogueId, String name, Timestamp updateTime, int version, String comment) {
+		this.id = id;
+		this.catalogueId = catalogueId;
+		this.name = name;
+		this.updateTime = updateTime;
+		this.version = version;
+		this.comment = comment;
+	}
+
+	public Product(Long id, Long catalogueId, String catalogueName, Long productId, String name, BigDecimal price, int stockAmount,
+			Timestamp updateTime, int version, String comment) {
+		this.id = id;
+		this.catalogueId = catalogueId;
+		this.catalogueName = catalogueName;
+		this.productId = productId;
+		this.name = name;
+		this.price = price;
+		this.stockAmount = stockAmount;
+		this.updateTime = updateTime;
 		this.version = version;
 		this.comment = comment;
 	}
@@ -37,6 +94,30 @@ public class Product {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+	public Long getCatalogueId() {
+		return catalogueId;
+	}
+
+	public void setCatalogueId(Long catalogueId) {
+		this.catalogueId = catalogueId;
+	}
+
+	public String getCatalogueName() {
+		return catalogueName;
+	}
+
+	public void setCatalogueName(String catalogueName) {
+		this.catalogueName = catalogueName;
+	}
+
+	public Long getProductId() {
+		return productId;
+	}
+
+	public void setProductId(Long productId) {
+		this.productId = productId;
 	}
 
 	public String getName() {
@@ -55,12 +136,20 @@ public class Product {
 		this.price = price;
 	}
 
-	public int getStock() {
-		return stock;
+	public int getStockAmount() {
+		return stockAmount;
 	}
 
-	public void setStock(int stock) {
-		this.stock = stock;
+	public void setStockAmount(int stockAmount) {
+		this.stockAmount = stockAmount;
+	}
+
+	public Timestamp getUpdateTime() {
+		return updateTime;
+	}
+
+	public void setUpdateTime(Timestamp updateTime) {
+		this.updateTime = updateTime;
 	}
 
 	public int getVersion() {

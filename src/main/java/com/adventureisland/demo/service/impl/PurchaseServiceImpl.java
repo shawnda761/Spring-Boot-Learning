@@ -14,21 +14,21 @@ import com.adventureisland.demo.service.PurchaseService;
 
 @Service
 public class PurchaseServiceImpl implements PurchaseService {
-	
+
 	@Autowired
 	private ProductService productService;
-	
+
 	@Autowired
 	private PurchaseDao purchaseDao;
 
 	@Override
 	@Transactional
 	public boolean purchase(Long userId, Long productId, int amount) {
-		Product product = productService.getProductById(productId);
-		if (product.getStock() < amount) {
+		Product product = productService.getProductById(productId).get(0);
+		if (product.getStockAmount() < amount) {
 			return false;
 		}
-		product.setStock(product.getStock() - amount);
+		product.setStockAmount(product.getStockAmount() - amount);
 		purchaseDao.insertPurchaseRecord(initPurchase(userId, product, amount));
 		return true;
 	}
