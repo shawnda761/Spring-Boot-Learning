@@ -107,6 +107,7 @@ public class MapperScannerRegistrar implements ImportBeanDefinitionRegistrar, Re
 			builder.addPropertyValue("nameGenerator", BeanUtils.instantiateClass(generatorClass));
 		}
 
+		@SuppressWarnings("rawtypes")
 		Class<? extends MapperFactoryBean> mapperFactoryBeanClass = annoAttrs.getClass("factoryBean");
 		if (!MapperFactoryBean.class.equals(mapperFactoryBeanClass)) {
 			builder.addPropertyValue("mapperFactoryBeanClass", mapperFactoryBeanClass);
